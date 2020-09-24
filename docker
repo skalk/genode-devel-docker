@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+#
+# \brief  Docker container and image for the Genode OS Framework
+# \author Stefan Kalkowski
+# \date   2020-09-21
+#
+
+help:
+	$(ECHO)
+	$(ECHO) "Genode development docker container control utility"
+	$(ECHO)
+	$(ECHO) "--- available commands ---"
+	$(ECHO) "build        - build and export genode docker image from scratch"
+	$(ECHO) "import       - import pre-build docker image from genode.org"
+	$(ECHO) "create       - create new interactive genode docker container"
+	$(ECHO) "               user and group ids and home directory are mapped 1:1"
+	$(ECHO) "run          - spawn instance of formerly created docker container"
+	$(ECHO) "clean        - delete genode docker container and images"
+	$(ECHO)
+	$(ECHO) "--- variables evaluated ---"
+	$(ECHO) "MAKE_JOBS             - number of parallel jobs for build (default: 4)"
+	$(ECHO) "SUDO                  - optional sudo command (default: empty)"
+	$(ECHO) "DOCKER_CONTAINER_ARGS - additional arguments for container creation"
+	$(ECHO)
+
+SUDO                  ?=
+MAKE_JOBS             ?= 4
+DOCKER_CONTAINER_ARGS ?=
+
+UID                   := $(shell id -u)
+GID                   := $(shell id -g)
+ECHO                  := @echo
+DOCKER_IMAGE          := genode-docker-20.04-image
+DOCKER_CONTAINER      := genode-docker-20.04
+
+CONTAINER_ARGS         = $(DOCKER_CONTAINER_ARGS)
+CONTAINER_ARGS        += --interactive --tty
+CONTAINER_ARGS        += --workdir $(HOME)
+CONTAINER_ARGS        += --user $(UID):$(GID) 
+CONTAINER_ARGS        += --volume="/etc/passwd:/etc/passwd:ro"
+CONTAINER_ARGS        += --volume="/etc/group:/etc/group:ro"
+CONTAINER_ARGS        += --volume="$(HOME):$(HOME):rw"
+CONTAINER_ARGS        += --name=$(DOCKER_CONTAINER)
+CONTAINER_ARGS        += --hostname=$(DOCKER_CONTAINER)
+
+DOCKER_IMAGE_TAR       = genode-docker-20.04-image.tar
+DOCKER_IMAGE_TAR_URI   = https://genode.org/files/$(DOCKER_IMAGE_TAR)
+DOCKER_IMAGE_TAR_SHA   = 6148d72ba9b828ee9a5e0a3fbf8932537e857f1b
+
+build:
+	$(SUDO) docker build -t $(DOCKER_IMAGE) --build-arg JOBS=$(MAKE_JOBS) .
+	$(SUDO) docker save $(DOCKER_IMAGE) > $(DOCKER_IMAGE_TAR)
+
+import:
+	curl -s -o $(DOCKER_IMAGE_TAR) $(DOCKER_IMAGE_TAR_URI)
+	$(ECHO) "$(DOCKER_IMAGE_TAR_SHA)  $(DOCKER_IMAGE_TAR)" > $(DOCKER_IMAGE_TAR).sha
+	sha1sum -c $(DOCKER_IMAGE_TAR).sha
+	$(SUDO) docker load < $(DOCKER_IMAGE_TAR)
+	rm $(DOCKER_IMAGE_TAR) $(DOCKER_IMAGE_TAR).sha
+
+run:
+	$(SUDO) docker start  $(DOCKER_CONTAINER)
+	$(SUDO) docker attach $(DOCKER_CONTAINER)
+
+create:
+	$(SUDO) docker create $(CONTAINER_ARGS) $(DOCKER_IMAGE) /bin/bash
+
+clean:
+	$(SUDO) docker rm       $(DOCKER_CONTAINER)
+	$(SUDO) docker image rm $(DOCKER_IMAGE)
+	$(SUDO) docker image prune
