@@ -40,8 +40,10 @@ CONTAINER_ARGS        += --user $(UID):$(GID)
 CONTAINER_ARGS        += --volume="/etc/passwd:/etc/passwd:ro"
 CONTAINER_ARGS        += --volume="/etc/group:/etc/group:ro"
 CONTAINER_ARGS        += --volume="$(HOME):$(HOME):rw"
+CONTAINER_ARGS        += --env DISPLAY=$(DISPLAY)
+CONTAINER_ARGS        += --volume "/tmp/.X11-unix:/tmp/.X11-unix"
 CONTAINER_ARGS        += --name=$(DOCKER_CONTAINER)
-CONTAINER_ARGS        += --hostname=$(DOCKER_CONTAINER)
+CONTAINER_ARGS        += --hostname=$(shell hostname)
 
 DOCKER_IMAGE_TAR       = genode-docker-20.04-image.tar
 DOCKER_IMAGE_TAR_URI   = https://genode.org/files/$(DOCKER_IMAGE_TAR)
