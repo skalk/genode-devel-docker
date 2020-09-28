@@ -16,7 +16,7 @@ help:
 	$(ECHO) "               (user and group ids and home directory are mapped 1:1)"
 	$(ECHO) "admin        - spawn container root instance with genode docker image"
 	$(ECHO) "               (enables you to install additional packages)"
-	$(ECHO) "clean        - delete genode docker container *and images*"
+	$(ECHO) "clean        - delete genode docker image"
 	$(ECHO)
 	$(ECHO) "--- variables evaluated ---"
 	$(ECHO) "MAKE_JOBS             - number of parallel jobs for build (default: 4)"
@@ -78,6 +78,5 @@ admin:
 	$(SUDO) docker rm     $(DOCKER_CONTAINER)-admin
 
 clean:
-	$(SUDO) docker rm       $(DOCKER_CONTAINER)
 	$(SUDO) docker image rm $(DOCKER_IMAGE)
 	$(SUDO) docker image prune
