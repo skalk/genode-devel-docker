@@ -22,9 +22,9 @@ Usage:
 
 * build  : build and export genode docker image from scratch
 * import : import pre-build docker image from genode.org
-* create : create new interactive genode docker container
-* run    : spawn instance of already created docker container
-* clean  : delete genode docker container and images
+* run    : create and run interactive genode docker container
+* admin  : spawn container root instance with genode docker image
+* clean  : delete genode docker images
 
 --- the following variables are used within the commands ---
 

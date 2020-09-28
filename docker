@@ -12,10 +12,11 @@ help:
 	$(ECHO) "--- available commands ---"
 	$(ECHO) "build        - build and export genode docker image from scratch"
 	$(ECHO) "import       - import pre-build docker image from genode.org"
-	$(ECHO) "create       - create new interactive genode docker container"
-	$(ECHO) "               user and group ids and home directory are mapped 1:1"
-	$(ECHO) "run          - spawn instance of formerly created docker container"
-	$(ECHO) "clean        - delete genode docker container and images"
+	$(ECHO) "run          - create and run interactive genode docker container"
+	$(ECHO) "               (user and group ids and home directory are mapped 1:1)"
+	$(ECHO) "admin        - spawn container root instance with genode docker image"
+	$(ECHO) "               (enables you to install additional packages)"
+	$(ECHO) "clean        - delete genode docker container *and images*"
 	$(ECHO)
 	$(ECHO) "--- variables evaluated ---"
 	$(ECHO) "MAKE_JOBS             - number of parallel jobs for build (default: 4)"
@@ -33,8 +34,14 @@ ECHO                  := @echo
 DOCKER_IMAGE          := genode-docker-20.04-image
 DOCKER_CONTAINER      := genode-docker-20.04
 
-CONTAINER_ARGS         = $(DOCKER_CONTAINER_ARGS)
-CONTAINER_ARGS        += --interactive --tty
+COMMON_CONTAINER_ARGS  = $(DOCKER_CONTAINER_ARGS)
+COMMON_CONTAINER_ARGS += --interactive --tty
+
+ADMIN_CONTAINER_ARGS   = $(COMMON_CONTAINER_ARGS)
+ADMIN_CONTAINER_ARGS  += --name=$(DOCKER_CONTAINER)-admin
+
+CONTAINER_ARGS         = $(COMMON_CONTAINER_ARGS)
+CONTAINER_ARGS        += --rm
 CONTAINER_ARGS        += --workdir $(HOME)
 CONTAINER_ARGS        += --user $(UID):$(GID) 
 CONTAINER_ARGS        += --volume="/etc/passwd:/etc/passwd:ro"
@@ -61,11 +68,14 @@ import:
 	rm $(DOCKER_IMAGE_TAR) $(DOCKER_IMAGE_TAR).sha
 
 run:
-	$(SUDO) docker start  $(DOCKER_CONTAINER)
-	$(SUDO) docker attach $(DOCKER_CONTAINER)
+	$(SUDO) docker run $(CONTAINER_ARGS) $(DOCKER_IMAGE) /bin/bash
 
-create:
-	$(SUDO) docker create $(CONTAINER_ARGS) $(DOCKER_IMAGE) /bin/bash
+admin:
+	$(SUDO) docker create $(ADMIN_CONTAINER_ARGS) $(DOCKER_IMAGE)
+	$(SUDO) docker start  $(DOCKER_CONTAINER)-admin
+	$(SUDO) docker attach $(DOCKER_CONTAINER)-admin
+	$(SUDO) docker commit $(DOCKER_CONTAINER)-admin $(DOCKER_IMAGE)
+	$(SUDO) docker rm     $(DOCKER_CONTAINER)-admin
 
 clean:
 	$(SUDO) docker rm       $(DOCKER_CONTAINER)
