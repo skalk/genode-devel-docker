@@ -41,13 +41,14 @@ ARG SPIKE_ISA_SHA1=ca467006bd6327a58fe8308f64466cd0ed03f152
 #
 RUN apt update && \
     apt install -y acpica-tools autoconf autoconf2.64 autogen bash-completion \
-                   bison build-essential byacc ccache curl e2tools expect flex \
-                   gdisk gnat git gprbuild libc-dev-bin libexpat1-dev \
-                   libfontconfig1 libncurses-dev libpixman-1-dev libsdl1.2-dev \
-                   libxml2-utils mawk patch python-is-python3 python-six \
+                   binutils-dev bison build-essential byacc ccache cpio curl \
+                   e2tools expect flex gawk gdisk gnat git gprbuild \
+                   libc-dev-bin libexpat1-dev libfontconfig1 libncurses-dev \
+                   libpixman-1-dev libsdl1.2-dev libsdl2-dev libxml2-utils \
+                   mawk patch picocom python-is-python3 python-six \
                    python2-minimal python3-future python3-minimal python3-ply \
-                   python3-tempita tcl texinfo tidy vim wget xorriso xsltproc \
-                   xz-utils yasm && \
+                   python3-six python3-tempita socat tcl telnet texinfo tidy \
+                   u-boot-tools vim wget xorriso xsltproc xz-utils yasm && \
     apt clean
 
 #

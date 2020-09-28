@@ -47,7 +47,7 @@ CONTAINER_ARGS        += --hostname=$(shell hostname)
 
 DOCKER_IMAGE_TAR       = genode-docker-20.04-image.tar
 DOCKER_IMAGE_TAR_URI   = https://genode.org/files/$(DOCKER_IMAGE_TAR)
-DOCKER_IMAGE_TAR_SHA   = 6148d72ba9b828ee9a5e0a3fbf8932537e857f1b
+DOCKER_IMAGE_TAR_SHA   = c8a93c26ba7c8938615a7e2373cea15c58439c54
 
 build:
 	$(SUDO) docker build -t $(DOCKER_IMAGE) --build-arg JOBS=$(MAKE_JOBS) .
