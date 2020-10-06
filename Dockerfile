@@ -44,7 +44,7 @@ RUN apt update && \
                    binutils-dev bison build-essential byacc ccache cpio curl \
                    dosfstools e2tools expect flex gawk gdisk gnat git gprbuild \
                    libc-dev-bin libexpat1-dev libfontconfig1 libncurses-dev \
-                   libpixman-1-dev libsdl1.2-dev libsdl2-dev libxml2-utils \
+                   libpixman-1-dev libsdl1.2-dev libsdl2-dev libxml2-utils lynx \
                    mawk mtools patch picocom python-is-python3 python-six \
                    python2-minimal python3-future python3-minimal python3-ply \
                    python3-six python3-tempita socat tcl telnet texinfo tidy \
@@ -66,7 +66,7 @@ RUN curl -s -L -o /${QEMU_FILE} https://download.qemu.org/${QEMU_FILE}  && \
     rm -r /qemu-4.2.1*
 
 #
-# Install Genode specific GNU compiler toolchain + QT5 tools
+# Install Genode specific GNU compiler toolchain + QT5 tools + netperf testing
 #
 RUN curl -s -L -o ${GENODE_FILE} ${GENODE_URL}/tarball/${GENODE_BRANCH} && \
     echo "${GENODE_SHA1} ${GENODE_FILE}" > ${GENODE_FILE}.sha1          && \
@@ -79,6 +79,11 @@ RUN curl -s -L -o ${GENODE_FILE} ${GENODE_URL}/tarball/${GENODE_BRANCH} && \
     tool/tool_chain     riscv    SUDO= MAKE_JOBS=${JOBS}                && \
     tool/tool_chain_qt5 build    SUDO= MAKE_JOBS=${JOBS}                && \
     tool/tool_chain_qt5 install  SUDO= MAKE_JOBS=${JOBS}                && \
+    tool/ports/prepare_port netperf                                     && \
+    cd `tool/ports/current netperf`/src/app/netperf                     && \
+    ./configure                                                         && \
+    make -j${JOBS}                                                      && \
+    make install                                                        && \
     cd /                                                                && \
     rm -rf /genode*
 
