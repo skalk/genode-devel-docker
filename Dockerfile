@@ -1,6 +1,6 @@
 FROM  ubuntu:20.04
 LABEL maintainer="stefan.kalkowski@genode-labs.com"
-LABEL version="1.0"
+LABEL version="21.05"
 LABEL description="This is a docker image to develop Genode OS components"
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -10,24 +10,10 @@ ARG QEMU_SHA1=03d221806203a32795042279e0a21413a0c5ffc3
 ARG QEMU_FILE=qemu-4.2.1.tar.xz
 ARG QEMU_TARGET_LIST=aarch64-softmmu,arm-softmmu,i386-softmmu,riscv64-softmmu,x86_64-softmmu
 
-ARG GENODE_SHA1=f913db7882deab799c98bcaf0be2671e2c1bdd18
-ARG GENODE_BRANCH=2491eee
+ARG GENODE_SHA1=b1498ebcb9914848ea76a16dcceef83c3cc05b70
+ARG GENODE_BRANCH=c0150f9
 ARG GENODE_URL=https://github.com/genodelabs/genode
 ARG GENODE_FILE=genode.tgz
-
-ARG GNAT_URL=https://community.download.adacore.com/v1
-ARG GNAT_SHA1=0cd3e2a668332613b522d9612ffa27ef3eb0815b
-ARG GNAT_FILE=gnat-community-2019-20190517-x86_64-linux-bin
-ARG GNAT_GIT_URL=https://github.com/AdaCore/gnat_community_install_script
-ARG GNAT_GIT_BRANCH=f74ecb0
-ARG GNAT_GIT_SHA1=b700e32f72ed2f9337cb45a69aa8cc3a23fdd0e1
-
-ARG SPIKE_FES_URL=https://github.com/ssumpf/riscv-fesvr
-ARG SPIKE_FES_BRANCH=0b85715
-ARG SPIKE_FES_SHA1=66a2d0d28d2a6223e0e2830f4cfcc5af300d788c
-ARG SPIKE_ISA_URL=https://github.com/ssumpf/riscv-isa-sim
-ARG SPIKE_ISA_BRANCH=f38dcde
-ARG SPIKE_ISA_SHA1=ca467006bd6327a58fe8308f64466cd0ed03f152
 
 
 #
@@ -86,41 +72,3 @@ RUN curl -s -L -o ${GENODE_FILE} ${GENODE_URL}/tarball/${GENODE_BRANCH} && \
     make install                                                        && \
     cd /                                                                && \
     rm -rf /genode*
-
-#
-# Install AdaCore Community toolchain to build Muen separation kernel
-#
-RUN curl -s -L -o gnat_install.tgz ${GNAT_GIT_URL}/tarball/${GNAT_GIT_BRANCH}  && \
-    echo "${GNAT_GIT_SHA1}  gnat_install.tgz" > gnat_install.tgz.sha1          && \
-    sha1sum -c gnat_install.tgz.sha1                                           && \
-    curl -s -L -o ${GNAT_FILE} ${GNAT_URL}/${GNAT_SHA1}?filename=${GNAT_FILE}  && \
-    echo "${GNAT_SHA1}  ${GNAT_FILE}" > ${GNAT_FILE}.sha1                      && \
-    sha1sum -c ${GNAT_FILE}.sha1                                               && \
-    tar xzf gnat_install.tgz                                                   && \
-    sh /AdaCore-gnat_community_install_script-${GNAT_GIT_BRANCH}/install_package.sh /${GNAT_FILE} \
-       /opt/GNAT/2019 com.adacore.gnat,com.adacore.spark2014_discovery         && \
-    rm -rf /AdaCore-* /gnat*
-
-#
-# Install Spike emulator for RiscV testing
-#
-RUN curl -s -L -o fesvr.tgz ${SPIKE_FES_URL}/tarball/${SPIKE_FES_BRANCH} && \
-    echo "${SPIKE_FES_SHA1} fesvr.tgz" > fesvr.tgz.sha1                  && \
-    sha1sum -c fesvr.tgz.sha1                                            && \
-    tar xzf fesvr.tgz                                                    && \
-    cd /ssumpf-riscv-fesvr-${SPIKE_FES_BRANCH}                           && \
-    ./configure                                                          && \
-    make -j${JOBS}                                                       && \
-    make install                                                         && \
-    cd /                                                                 && \
-    curl -s -L -o isa.tgz ${SPIKE_ISA_URL}/tarball/${SPIKE_ISA_BRANCH}   && \
-    echo "${SPIKE_ISA_SHA1} isa.tgz" > isa.tgz.sha1                      && \
-    sha1sum -c isa.tgz.sha1                                              && \
-    tar xzf isa.tgz                                                      && \
-    cd /ssumpf-riscv-isa-sim-${SPIKE_ISA_BRANCH}                         && \
-    export CXXFLAGS="-Wno-catch-value -Wno-switch-unreachable"           && \
-    ./configure                                                          && \
-    make -j${JOBS}                                                       && \
-    make install                                                         && \
-    cd /                                                                 && \
-    rm -rf /ssumpf-* fesvr.* isa.*
