@@ -31,8 +31,8 @@ DOCKER_CONTAINER_ARGS ?=
 UID                   := $(shell id -u)
 GID                   := $(shell id -g)
 ECHO                  := @echo
-DOCKER_IMAGE          := genode-23.05-image:23.05
-DOCKER_CONTAINER      := genode-23.05
+DOCKER_IMAGE          := genode-25.02-image:25.02
+DOCKER_CONTAINER      := genode-25.02
 
 COMMON_CONTAINER_ARGS  = $(DOCKER_CONTAINER_ARGS)
 COMMON_CONTAINER_ARGS += --interactive --tty
@@ -52,9 +52,9 @@ CONTAINER_ARGS        += --volume "/tmp/.X11-unix:/tmp/.X11-unix"
 CONTAINER_ARGS        += --name=$(DOCKER_CONTAINER)
 CONTAINER_ARGS        += --hostname=$(shell hostname)
 
-DOCKER_IMAGE_TAR       = genode-23.05-docker-image.tar
+DOCKER_IMAGE_TAR       = genode-25.02-docker-image.tar
 DOCKER_IMAGE_TAR_URI   = https://genode.org/files/$(DOCKER_IMAGE_TAR)
-DOCKER_IMAGE_TAR_SHA   = d1b1dc92cd957a43046852497a12e51081adea1a
+DOCKER_IMAGE_TAR_SHA   = b1d8dcbfa0ca9b9a6bbc8c3aafa70637dddd6d68
 
 build:
 	$(SUDO) docker build -t $(DOCKER_IMAGE) --build-arg JOBS=$(MAKE_JOBS) .
