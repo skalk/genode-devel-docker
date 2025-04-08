@@ -47,7 +47,7 @@ RUN apt update && \
         bc binutils-dev bison build-essential byacc ccache cmake cpio curl \
         dosfstools e2tools ed expect flex gawk gdisk git gnat-13 \
         libc-dev-bin libcurl4-openssl-dev libelf-dev libexpat1-dev libfontconfig1 libglib2.0-dev libgmp-dev \
-        libncurses-dev libpixman-1-dev libsdl2-dev libslirp-dev libtool libxml2-utils libxml2-dev \
+        libncurses-dev libpixman-1-dev libsdl2-dev libslirp-dev libsoap-lite-perl libtool libxml2-utils libxml2-dev \
         lighttpd lynx mawk mtools ninja-build ovmf patch picocom pip pkg-config \
         python3-minimal python3-venv socat tcl telnet texinfo tidy u-boot-tools unzip vim \
         wget xorriso xsltproc xz-utils yasm && \
@@ -97,7 +97,8 @@ RUN curl -s -L -o ${OWSM_FILE} ${OWSM_URL}/${OWSM_FILE}    && \
     PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure   && \
     make install                                           && \
     cd /                                                   && \
-    rm -rf wsmancli* ${WSMC_FILE}*
+    rm -rf wsmancli* ${WSMC_FILE}*                         && \
+    ldconfig
 
 #
 # Build & install amtterm
